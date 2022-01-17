@@ -32,7 +32,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface
      */
     public function get(string $id)
     {
-        return $this->lookupService($id);
+        return $this->lookup($id);
     }
 
     /**
@@ -48,18 +48,14 @@ class Container implements ContainerInterface, ContainerRegistryInterface
      */
     public function register(string $id, \Closure $service): void
     {
-        if($this->has($id)) {
-            throw new ServiceRegistrationException($id);
-        }
-
         $this->servicesRaw[$id] = $service;
     }
 
     /**
-     * @param string $id
+     * @param  string $id
      * @return object
      */
-    private function lookupService(string $id): object
+    private function lookup(string $id): object
     {
         if(!empty($this->services[$id])) {
             return $this->services[$id];
@@ -69,7 +65,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface
     }
 
     /**
-     * @param string $id
+     * @param  string $id
      * @return object
      */
     private function createServiceInstance(string $id): object
@@ -80,7 +76,6 @@ class Container implements ContainerInterface, ContainerRegistryInterface
 
         $raw = $this->servicesRaw[$id];
         $service = $raw($this);
-
         $this->services[$id] = $service;
 
         return $service;

@@ -13,9 +13,13 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
 
-        $container->register('test', function ( Container $container ) { return new class {
-            public string $name = 'success';
-        }; });
+        $container->register(
+            'test', function ( Container $container ) {
+                return new class {
+                    public string $name = 'success';
+                }; 
+            }
+        );
 
         $service = $container->get('test');
         $this->assertIsObject($service);
@@ -27,8 +31,18 @@ class ContainerTest extends TestCase
         $this->expectException(ServiceRegistrationException::class);
         $container = new Container();
 
-        $container->register('test', function ( Container $container ) { return new class {}; });
-        $container->register('test', function ( Container $container ) { return new class {}; });
+        $container->register(
+            'test', function ( Container $container ) {
+                return new class {
+                }; 
+            }
+        );
+        $container->register(
+            'test', function ( Container $container ) {
+                return new class {
+                }; 
+            }
+        );
     }
 
     public function testContainerUnresolvedException(): void
@@ -36,9 +50,13 @@ class ContainerTest extends TestCase
         $this->expectException(ServiceNotRegisteredException::class);
 
         $container = new Container();
-        $container->register('test', function ( Container $container ) { return new class {
-            public string $name = 'success';
-        }; });
+        $container->register(
+            'test', function ( Container $container ) {
+                return new class {
+                    public string $name = 'success';
+                }; 
+            }
+        );
 
         $container->get('test2');
     }
