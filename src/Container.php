@@ -27,15 +27,9 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      */
     private array $decorators = [];
 
-    /**
-     * @var AutowireHelperFactoryInterface
-     */
-    private AutowireHelperFactoryInterface $autowireHelperFactory;
-
     public function __construct(
     )
     {
-        $this->autowireHelperFactory = new AutowireHelperFactory($this);
         $this->services = [];
         $this->servicesRaw = [];
     }
@@ -107,9 +101,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
         }
 
         $raw = $this->servicesRaw[$serviceId];
-
         $service = $raw($this);
-
         $this->services[$serviceId] = $service;
 
         if(!array_key_exists($serviceId, $this->decorators)) {
@@ -122,10 +114,9 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
             return $left[1] > $right[1];
         });
 
-        $helper = $this->autowireHelperFactory->create();
-
+        /** @var array<Closure, int> $decorator */
         foreach ($decorators as $decorator) {
-            $this->services[$serviceId] = $helper->autowire($decorator[0])();
+            $this->services[$serviceId] = $decorator[0]();
         }
     }
 }

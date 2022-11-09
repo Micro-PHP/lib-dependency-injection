@@ -2,6 +2,7 @@
 
 namespace Micro\Component\DependencyInjection\Tests;
 
+use Micro\Component\DependencyInjection\Autowire\ContainerAutowire;
 use Micro\Component\DependencyInjection\Container;
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
@@ -63,7 +64,7 @@ class ContainerTest extends TestCase
 
     public function testDecorateService(): void
     {
-        $container = new Container();
+        $container = new ContainerAutowire(new Container());
 
         $container->register('test', function ($container) {
             return new class {
