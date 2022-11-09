@@ -3,12 +3,14 @@
 namespace Micro\Component\DependencyInjection;
 
 
+use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactory;
+use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactoryInterface;
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
-use Psr\Container\ContainerInterface;
 use \Closure;
+use Psr\Container\ContainerInterface;
 
-class Container implements ContainerInterface, ContainerRegistryInterface
+class Container implements ContainerInterface, ContainerRegistryInterface, ContainerDecoratorInterface
 {
     /**
      * @var array<string, object>
@@ -16,13 +18,24 @@ class Container implements ContainerInterface, ContainerRegistryInterface
     private array $services;
 
     /**
-     * @var array<string, Closure>
+     * @var array<string, Closure|string>
      */
     private array $servicesRaw;
 
+    /**
+     * @var array<string, array<Closure, int>>
+     */
+    private array $decorators = [];
 
-    public function __construct()
+    /**
+     * @var AutowireHelperFactoryInterface
+     */
+    private AutowireHelperFactoryInterface $autowireHelperFactory;
+
+    public function __construct(
+    )
     {
+        $this->autowireHelperFactory = new AutowireHelperFactory($this);
         $this->services = [];
         $this->servicesRaw = [];
     }
@@ -46,13 +59,30 @@ class Container implements ContainerInterface, ContainerRegistryInterface
     /**
      * {@inheritDoc}
      */
-    public function register(string $id, \Closure $service): void
+    public function register(string $id, Closure $service): void
     {
+        if($this->has($id)) {
+            throw new ServiceRegistrationException(sprintf('Service "%s" already registered', $id));
+        }
+
         $this->servicesRaw[$id] = $service;
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function decorate(string $id, Closure $service, int $priority = 0): void
+    {
+        if(!array_key_exists($id, $this->decorators)) {
+            $this->decorators[$id] = [];
+        }
+
+        $this->decorators[$id][] = [$service, $priority];
+    }
+
+    /**
      * @param  string $id
+     *
      * @return object
      */
     private function lookup(string $id): object
@@ -61,23 +91,41 @@ class Container implements ContainerInterface, ContainerRegistryInterface
             return $this->services[$id];
         }
 
-        return $this->createServiceInstance($id);
+        $this->initializeService($id);
+
+        return $this->services[$id];
     }
 
     /**
-     * @param  string $id
+     * @param string $serviceId
      * @return object
      */
-    private function createServiceInstance(string $id): object
+    protected function initializeService(string $serviceId): void
     {
-        if(empty($this->servicesRaw[$id])) {
-            throw new ServiceNotRegisteredException($id);
+        if(empty($this->servicesRaw[$serviceId])) {
+            throw new ServiceNotRegisteredException($serviceId);
         }
 
-        $raw = $this->servicesRaw[$id];
-        $service = $raw($this);
-        $this->services[$id] = $service;
+        $raw = $this->servicesRaw[$serviceId];
 
-        return $service;
+        $service = $raw($this);
+
+        $this->services[$serviceId] = $service;
+
+        if(!array_key_exists($serviceId, $this->decorators)) {
+            return;
+        }
+
+        $decorators = $this->decorators[$serviceId];
+
+        usort($decorators, function(array $left, array $right): bool {
+            return $left[1] > $right[1];
+        });
+
+        $helper = $this->autowireHelperFactory->create();
+
+        foreach ($decorators as $decorator) {
+            $this->services[$serviceId] = $helper->autowire($decorator[0])();
+        }
     }
 }
