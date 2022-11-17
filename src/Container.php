@@ -110,8 +110,14 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
 
         $decorators = $this->decorators[$serviceId];
 
-        usort($decorators, function(array $left, array $right): bool {
-            return $left[1] > $right[1];
+        usort($decorators, function(array $left, array $right): int {
+            $l = $left[1];
+            $r = $right[1];
+            if($l === $r) {
+                return 0;
+            }
+
+            return $left[1] > $right[1] ? 1 : -1;
         });
 
         /** @var array<Closure, int> $decorator */
