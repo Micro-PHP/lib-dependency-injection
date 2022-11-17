@@ -30,7 +30,7 @@ After adding the library to your project, include the file autoload.php found in
 include 'vendor/autoload.php';
 ```
 
-Simple usage:
+#### Simple usage:
 ```php
 use \Micro\Component\DependencyInjection\Container;
 
@@ -53,6 +53,58 @@ $container->register(Mailer::class, function(Container $container) {
 
 $mailer = $container->get(Mailer::class);
 ```
+
+#### Service decoration.
+
+```php
+interface HelloWorldFacadeInterface
+{
+    public function hello(string $name): string;
+}
+
+class HelloWorldFacade implements HelloWorldFacadeInterface
+{
+    public function hello(string $name): string
+    {
+        return "Hello, {$name}.";
+    }
+}
+
+
+class HelloWorldDecorator implements HelloWorldFacadeInterface
+{
+    public function __construct(
+        private readonly HelloWorldFacadeInterface $decoratedService,
+    )
+    {
+    }
+    
+    public function hello(string $name): string
+    {
+        $result = $this->decoratedService->hello($name);
+        
+        return $result . ' I\'m glad to see you';
+    }
+}
+
+$container = new Container();
+
+$container->register(HelloWorldFacadeInterface::class, function () {
+    return new HelloWorldFacade();
+});
+
+$container->decorate(HelloWorldFacadeInterface::class, function(
+    HelloWorldFacadeInterface $serviceForDecoration
+) {
+    return new HelloWorldLoggerAwareDecorator($serviceForDecoration);
+});
+
+echo $container->get(HelloWorldFacadeInterface::class)->hello('Stas');
+// Output: Hello, Stas. I'm glad to see you
+
+
+```
+
 
 ### Sample code for:
 
