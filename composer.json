@@ -3,7 +3,7 @@
     "description": "Dependency injection service container",
     "type": "library",
     "license": "MIT",
-    "version": "0.2",
+    "version": "1.0",
     "autoload": {
         "psr-4": {
             "Micro\\Component\\DependencyInjection\\": "src/"
@@ -18,6 +18,6 @@
     "require": {
         "php": ">=8.0",
         "psr/container": "^2.0",
-        "micro/autowire": "*"
+        "micro/autowire": "^1"
     }
 }
