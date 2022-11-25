@@ -2,9 +2,6 @@
 
 namespace Micro\Component\DependencyInjection;
 
-
-use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactory;
-use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactoryInterface;
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
 use \Closure;
@@ -35,9 +32,13 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     }
 
     /**
-     * {@inheritDoc}
+     * @template T
+     *
+     * @param class-string<T> $id
+     *
+     * @return T
      */
-    public function get(string $id)
+    public function get(string $id): object
     {
         return $this->lookup($id);
     }
