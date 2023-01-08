@@ -14,17 +14,16 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
 
-        $container->register(
-            'test', function ( Container $container ) {
-                return new class {
-                    public string $name = 'success';
-                }; 
-            }
-        );
+        $container->register('test', function () {
+            return new NamedService('success');
+        });
 
+        /** @var NamedInterface $service */
         $service = $container->get('test');
         $this->assertIsObject($service);
-        $this->assertEquals('success', $service->name);
+        $this->assertInstanceOf(NamedInterface::class, $service);
+        $this->assertInstanceOf(NamedService::class, $service);
+        $this->assertEquals('success', $service->getName());
     }
 
     public function testRegisterTwoServicesWithEqualAliasesException(): void
@@ -32,18 +31,8 @@ class ContainerTest extends TestCase
         $this->expectException(ServiceRegistrationException::class);
         $container = new Container();
 
-        $container->register(
-            'test', function ( Container $container ) {
-                return new class {
-                }; 
-            }
-        );
-        $container->register(
-            'test', function ( Container $container ) {
-                return new class {
-                }; 
-            }
-        );
+        $container->register('test', function () { return new class {}; });
+        $container->register('test', function () { return new class {}; });
     }
 
     public function testContainerUnresolvedException(): void
@@ -51,57 +40,68 @@ class ContainerTest extends TestCase
         $this->expectException(ServiceNotRegisteredException::class);
 
         $container = new Container();
-        $container->register(
-            'test', function ( Container $container ) {
-                return new class {
-                    public string $name = 'success';
-                }; 
-            }
-        );
+        $container->register('test', function () {
+            return new NamedService('success');
+        });
 
         $container->get('test2');
     }
 
     public function testDecorateService(): void
     {
-        $container = new ContainerAutowire(new Container());
+        $container = new Container();
 
-        $container->register('test', function ($container) {
-            return new class {
-                public function getA(): string { return 'D'; }
-            };
+        $container->register('test', function () {
+            return new NamedService('D');
         });
 
-
-        $container->decorate('test', function (Container $container) {
-            return new class($container->get('test')) {
-                public function __construct(private readonly object $decorated) {}
-                public function getA(): string {
-                    return 'C' . $this->decorated->getA();
-                }
-            };
+        $container->decorate('test', function (NamedInterface $decorated) {
+            return new NamedServiceDecorator($decorated, 'C');
         });
 
-        $container->decorate('test', function (Container $container) {
-            return new class($container->get('test')) {
-                public function __construct(private readonly object $decorated) {}
-                public function getA(): string {
-                    return 'A' . $this->decorated->getA();
-                }
-            };
+        $container->decorate('test', function (NamedInterface $decorated) {
+            return new NamedServiceDecorator($decorated, 'A');
         }, 10);
 
-        $container->decorate('test', function (Container $container) {
-            return new class($container->get('test')) {
-                public function __construct(private readonly object $decorated) {}
-                public function getA(): string {
-                    return 'B' . $this->decorated->getA();
-                }
-            };
+        $container->decorate('test', function (NamedInterface $decorated) {
+            return new NamedServiceDecorator($decorated, 'B');
         }, 5);
 
-
+        /** @var NamedInterface $result */
         $result = $container->get('test');
-        $this->assertEquals('ABCD', $result->getA());
+        $this->assertInstanceOf(NamedServiceDecorator::class, $result);
+        $this->assertInstanceOf(NamedInterface::class, $result);
+        $this->assertEquals('ABCD', $result->getName());
+    }
+}
+
+interface NamedInterface
+{
+    public function getName(): string;
+}
+
+readonly class NamedService implements NamedInterface
+{
+    public function __construct(private string $name)
+    {
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+readonly class NamedServiceDecorator implements NamedInterface
+{
+    public function __construct(
+        private object $decorated,
+        private string $name
+    ) {
+    }
+
+    public function getName(): string
+    {
+        return $this->name.$this->decorated->getName();
     }
 }

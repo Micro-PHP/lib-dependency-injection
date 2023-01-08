@@ -4,7 +4,6 @@ namespace Micro\Component\DependencyInjection;
 
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
-use \Closure;
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface, ContainerRegistryInterface, ContainerDecoratorInterface
@@ -12,24 +11,17 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     /**
      * @var array<string, object>
      */
-    private array $services;
+    private array $services = [];
 
     /**
-     * @var array<string, Closure|string>
+     * @var array<string, \Closure|string>
      */
-    private array $servicesRaw;
+    private array $servicesRaw = [];
 
     /**
-     * @var array<string, array<Closure, int>>
+     * @var array<string, array<int, \Closure>>
      */
     private array $decorators = [];
-
-    public function __construct(
-    )
-    {
-        $this->services = [];
-        $this->servicesRaw = [];
-    }
 
     /**
      * @template T
@@ -54,7 +46,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     /**
      * {@inheritDoc}
      */
-    public function register(string $id, Closure $service): void
+    public function register(string $id, \Closure $service): void
     {
         if($this->has($id)) {
             throw new ServiceRegistrationException(sprintf('Service "%s" already registered', $id));
@@ -66,13 +58,13 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     /**
      * {@inheritDoc}
      */
-    public function decorate(string $id, Closure $service, int $priority = 0): void
+    public function decorate(string $id, \Closure $service, int $priority = 0): void
     {
         if(!array_key_exists($id, $this->decorators)) {
             $this->decorators[$id] = [];
         }
 
-        $this->decorators[$id][] = [$service, $priority];
+        $this->decorators[$id][$priority] = $service;
     }
 
     /**
@@ -93,7 +85,6 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
 
     /**
      * @param string $serviceId
-     * @return object
      */
     protected function initializeService(string $serviceId): void
     {
@@ -101,8 +92,8 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
             throw new ServiceNotRegisteredException($serviceId);
         }
 
-        $raw = $this->servicesRaw[$serviceId];
-        $service = $raw($this);
+        $raw                        = $this->servicesRaw[$serviceId];
+        $service                    = $raw($this);
         $this->services[$serviceId] = $service;
 
         if(!array_key_exists($serviceId, $this->decorators)) {
@@ -111,19 +102,10 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
 
         $decorators = $this->decorators[$serviceId];
 
-        usort($decorators, function(array $left, array $right): int {
-            $l = $left[1];
-            $r = $right[1];
-            if($l === $r) {
-                return 0;
-            }
+        ksort($decorators);
 
-            return $left[1] > $right[1] ? 1 : -1;
-        });
-
-        /** @var array<Closure, int> $decorator */
         foreach ($decorators as $decorator) {
-            $this->services[$serviceId] = $decorator[0]();
+            $this->services[$serviceId] = $decorator($this->services[$serviceId], $this);
         }
     }
 }
