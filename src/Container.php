@@ -104,5 +104,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
                 $this->services[$serviceId] = $decorator($this->services[$serviceId], $this);
             }
         }
+
+        unset($this->decorators[$serviceId]);
     }
 }
