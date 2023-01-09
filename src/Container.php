@@ -60,11 +60,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      */
     public function decorate(string $id, \Closure $service, int $priority = 0): void
     {
-        if(!array_key_exists($id, $this->decorators)) {
-            $this->decorators[$id] = [];
-        }
-
-        $this->decorators[$id][$priority] = $service;
+        $this->decorators[$id][$priority][] = $service;
     }
 
     /**
@@ -100,12 +96,15 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
             return;
         }
 
-        $decorators = $this->decorators[$serviceId];
+        $decoratorsByPriority = $this->decorators[$serviceId];
+        krsort($decoratorsByPriority);
 
-        ksort($decorators);
-
-        foreach ($decorators as $decorator) {
-            $this->services[$serviceId] = $decorator($this->services[$serviceId], $this);
+        foreach ($decoratorsByPriority as $decorators) {
+            foreach ($decorators as $decorator) {
+                $this->services[$serviceId] = $decorator($this->services[$serviceId], $this);
+            }
         }
+
+        unset($this->decorators[$serviceId]);
     }
 }
