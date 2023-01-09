@@ -1,14 +1,8 @@
 {
     "name": "micro/dependency-injection",
     "description": "Dependency injection service container",
-    "type": "library",
     "license": "MIT",
-    "version": "1.1",
-    "autoload": {
-        "psr-4": {
-            "Micro\\Component\\DependencyInjection\\": "src/"
-        }
-    },
+    "type": "library",
     "authors": [
         {
             "name": "Stanislau.Komar",
@@ -16,8 +10,34 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
-        "psr/container": "^2.0",
-        "micro/autowire": "^1"
+        "php": "^8.2",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.29",
+        "phpmd/phpmd": "^2.13",
+        "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "conflict": {
+        "micro/autowire": "<1.1"
+    },
+    "suggest": {
+        "micro/autowire": "Autowire helper for dependency injection"
+    },
+    "autoload": {
+        "psr-4": {
+            "Micro\\Component\\DependencyInjection\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 ### Requirements
 
-PHP  >= 8.0.0
+PHP  >= 8.2
 
 ### How to use the library
 
@@ -34,7 +34,7 @@ include 'vendor/autoload.php';
 ```php
 use \Micro\Component\DependencyInjection\Container;
 
-class Logger {
+class Logger implements LoggerInterface {
 }
 
 class Mailer {
@@ -43,8 +43,12 @@ class Mailer {
 
 $container = new Container();
 
-$container->register(Logger::class, function(Container $container) {
+$container->register(LoggerInterface::class, function(Container $container) {
     return new Logger();
+});
+
+$container->register('logger.doctrine', function(Container $container) {
+    return new Logger('doctrine-channel');
 });
 
 $container->register(Mailer::class, function(Container $container) {
@@ -70,13 +74,11 @@ class HelloWorldFacade implements HelloWorldFacadeInterface
     }
 }
 
-
-class HelloWorldDecorator implements HelloWorldFacadeInterface
+class NiceHelloWorldDecorator implements HelloWorldFacadeInterface
 {
     public function __construct(
-        private readonly HelloWorldFacadeInterface $decoratedService,
-    )
-    {
+        private readonly HelloWorldFacadeInterface $decoratedService
+    ) {
     }
     
     public function hello(string $name): string
@@ -87,24 +89,50 @@ class HelloWorldDecorator implements HelloWorldFacadeInterface
     }
 }
 
+class HelloWorldLoggerAwareDecorator implements HelloWorldFacadeInterface
+{
+    public function __construct(
+        private readonly HelloWorldFacadeInterface $decoratedService,
+        private readonly LoggerInterface $logger
+    ) {
+    }
+
+    public function hello(string $name): string
+    {
+        $result = $this->decoratedService->hello($name);
+        
+        $this->logger->info->info($result);
+        
+        return $result;
+    }
+}
+
 $container = new Container();
 
 $container->register(HelloWorldFacadeInterface::class, function () {
     return new HelloWorldFacade();
 });
 
-$container->decorate(HelloWorldFacadeInterface::class, function(
-    HelloWorldFacadeInterface $serviceForDecoration
+$container->register(HelloWorldFacadeInterface::class, function (
+    HelloWorldFacadeInterface $decorated
 ) {
-    return new HelloWorldLoggerAwareDecorator($serviceForDecoration);
+    return new NiceHelloWorldDecorator($decorated);
+});
+
+$container->decorate(HelloWorldFacadeInterface::class, function(
+    HelloWorldFacadeInterface $decorated,
+    Container $container
+) {
+    return new HelloWorldLoggerAwareDecorator(
+        $decorated,
+        $container->get(LoggerInterface::class)
+    );
 });
 
 echo $container->get(HelloWorldFacadeInterface::class)->hello('Stas');
 // Output: Hello, Stas. I'm glad to see you
 
-
 ```
-
 
 ### Sample code for:
 

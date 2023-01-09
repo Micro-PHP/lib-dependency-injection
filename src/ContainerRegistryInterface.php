@@ -2,7 +2,6 @@
 
 namespace Micro\Component\DependencyInjection;
 
-
 interface ContainerRegistryInterface
 {
     /**
