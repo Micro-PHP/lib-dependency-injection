@@ -97,7 +97,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
         }
 
         $decoratorsByPriority = $this->decorators[$serviceId];
-        ksort($decoratorsByPriority);
+        krsort($decoratorsByPriority);
 
         foreach ($decoratorsByPriority as $decorators) {
             foreach ($decorators as $decorator) {

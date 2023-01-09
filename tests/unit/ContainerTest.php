@@ -52,19 +52,19 @@ class ContainerTest extends TestCase
         $container = new Container();
 
         $container->register('test', function () {
-            return new NamedService('D');
+            return new NamedService('A');
         });
 
         $container->decorate('test', function (NamedInterface $decorated) {
-            return new NamedServiceDecorator($decorated, 'C');
+            return new NamedServiceDecorator($decorated, 'D');
         });
-
-        $container->decorate('test', function (NamedInterface $decorated) {
-            return new NamedServiceDecorator($decorated, 'A');
-        }, 10);
 
         $container->decorate('test', function (NamedInterface $decorated) {
             return new NamedServiceDecorator($decorated, 'B');
+        }, 10);
+
+        $container->decorate('test', function (NamedInterface $decorated) {
+            return new NamedServiceDecorator($decorated, 'C');
         }, 5);
 
         /** @var NamedInterface $result */
@@ -79,11 +79,7 @@ class ContainerTest extends TestCase
         $container = new Container();
 
         $container->register('test', function () {
-            return new NamedService('E');
-        });
-
-        $container->decorate('test', function (NamedInterface $decorated) {
-            return new NamedServiceDecorator($decorated, 'D');
+            return new NamedService('A');
         });
 
         $container->decorate('test', function (NamedInterface $decorated) {
@@ -91,11 +87,15 @@ class ContainerTest extends TestCase
         }, 10);
 
         $container->decorate('test', function (NamedInterface $decorated) {
-            return new NamedServiceDecorator($decorated, 'C');
+            return new NamedServiceDecorator($decorated, 'D');
         });
 
         $container->decorate('test', function (NamedInterface $decorated) {
-            return new NamedServiceDecorator($decorated, 'A');
+            return new NamedServiceDecorator($decorated, 'E');
+        });
+
+        $container->decorate('test', function (NamedInterface $decorated) {
+            return new NamedServiceDecorator($decorated, 'C');
         }, 10);
 
         /** @var NamedInterface $result */
@@ -133,6 +133,6 @@ readonly class NamedServiceDecorator implements NamedInterface
 
     public function getName(): string
     {
-        return $this->name.$this->decorated->getName();
+        return $this->decorated->getName().$this->name;
     }
 }
