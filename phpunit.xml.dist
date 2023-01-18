@@ -17,10 +17,10 @@
   </coverage>
   <testsuites>
     <testsuite name="Micro Component: Dependency Injection Unit Test Suite">
-      <directory>tests/unit</directory>
+      <directory>tests/Unit</directory>
     </testsuite>
   </testsuites>
   <php>
-    <env name="APP_ENV" value="testing"/>
+    <env name="APP_ENV" value="dev-test"/>
   </php>
 </phpunit>

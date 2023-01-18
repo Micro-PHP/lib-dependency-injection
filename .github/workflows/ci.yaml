@@ -40,5 +40,5 @@ jobs:
           dependency-versions: "${{ matrix.dependency-versions }}"
           composer-options: "--prefer-dist --no-progress"
 
-      - name: "Run tests"
-        run: "./vendor/bin/phpunit"
+      - name: "RUn tests"
+        run: "composer coverage-html"
