@@ -41,25 +41,5 @@ jobs:
       - name: Download dependencies
         uses: ramsey/composer-install@v2
 
-      - name: PHP_CodeSniffer
-        run: ./vendor/bin/phpcs --standard=phpcs.xml ./src/
-
-  phpmd:
-    name: Mess Detector
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          coverage: none
-          tools: phpmd/phpmd:^2.13
-
-      - name: Download dependencies
-        uses: ramsey/composer-install@v2
-
-      - name: Mess Detector
-        run: ./vendor/bin/phpmd ./src/ github ./phpmd.xml
+      - name: Testing
+        run: composer statics
