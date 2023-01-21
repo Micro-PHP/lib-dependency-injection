@@ -14,10 +14,10 @@ namespace Micro\Component\DependencyInjection;
 interface ContainerDecoratorInterface
 {
     /**
-     * @template T
+     * @template T of object
      *
      * @param class-string<T> $id
-     * @param callable(): T   $service
+     * @param callable(mixed ...$parameters): T  $service
      */
     public function decorate(string $id, callable $service, int $priority = 0): void;
 }
