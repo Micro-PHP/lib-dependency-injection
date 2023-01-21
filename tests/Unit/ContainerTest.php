@@ -104,23 +104,23 @@ class ContainerTest extends TestCase
     {
         $container = new Container();
 
-        $container->register(NamedInterface::class, function () {
+        $container->register(NamedInterface::class, function (): NamedInterface {
             return new NamedService('A');
         });
 
-        $container->decorate(NamedInterface::class, function (NamedInterface $decorated) {
+        $container->decorate(NamedInterface::class, function (NamedInterface $decorated): NamedInterface {
             return new NamedServiceDecorator($decorated, 'B');
         }, 10);
 
-        $container->decorate(NamedInterface::class, function (NamedInterface $decorated) {
+        $container->decorate(NamedInterface::class, function (NamedInterface $decorated): NamedInterface {
             return new NamedServiceDecorator($decorated, 'D');
         });
 
-        $container->decorate(NamedInterface::class, function (NamedInterface $decorated) {
+        $container->decorate(NamedInterface::class, function (NamedInterface $decorated): NamedInterface {
             return new NamedServiceDecorator($decorated, 'E');
         });
 
-        $container->decorate(NamedInterface::class, function (NamedInterface $decorated) {
+        $container->decorate(NamedInterface::class, function (NamedInterface $decorated): NamedInterface {
             return new NamedServiceDecorator($decorated, 'C');
         }, 10);
 
