@@ -21,7 +21,7 @@ use Psr\Container\ContainerInterface;
 class Container implements ContainerInterface, ContainerRegistryInterface, ContainerDecoratorInterface
 {
     /**
-     * @var array<class-string, object>
+     * @var array<class-string, mixed>
      */
     private array $services = [];
 
@@ -43,7 +43,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      *
      * @param class-string<T> $id
      *
-     * @psalm-return object<T>
+     * @psalm-return T
      */
     public function get(string $id): object
     {
