@@ -9,11 +9,11 @@
  *  file that was distributed with this source code.
  */
 
-namespace Micro\Component\DependencyInjection\Tests;
+namespace Micro\Framework\DependencyInjection\Tests;
 
-use Micro\Component\DependencyInjection\Container;
-use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
-use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
+use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
+use Micro\Framework\DependencyInjection\Exception\ServiceRegistrationException;
 use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase

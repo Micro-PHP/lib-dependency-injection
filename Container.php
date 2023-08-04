@@ -9,10 +9,10 @@
  *  file that was distributed with this source code.
  */
 
-namespace Micro\Component\DependencyInjection;
+namespace Micro\Framework\DependencyInjection;
 
-use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
-use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
+use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
+use Micro\Framework\DependencyInjection\Exception\ServiceRegistrationException;
 use Psr\Container\ContainerInterface;
 
 /**

@@ -9,7 +9,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Micro\Component\DependencyInjection\Exception;
+namespace Micro\Framework\DependencyInjection\Exception;
 
 use Psr\Container\NotFoundExceptionInterface;
 
