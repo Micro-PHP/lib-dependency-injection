@@ -66,12 +66,9 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
         return !empty($this->servicesRaw[$id]) || !empty($this->services[$id]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function register(string $id, callable $service): void
+    public function register(string $id, callable $service, bool $force = false): void
     {
-        if ($this->has($id)) {
+        if ($this->has($id) && !$force) {
             throw new ServiceRegistrationException(sprintf('Service "%s" already registered', $id));
         }
 
@@ -79,8 +76,6 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @psalm-suppress InvalidPropertyAssignmentValue
      */
     public function decorate(string $id, callable $service, int $priority = 0): void

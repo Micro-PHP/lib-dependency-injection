@@ -21,5 +21,5 @@ interface ContainerRegistryInterface
      * @param class-string<T> $id      service alias
      * @param callable        $service service initialization callback
      */
-    public function register(string $id, callable $service): void;
+    public function register(string $id, callable $service, bool $force = false): void;
 }
