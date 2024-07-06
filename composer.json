@@ -2,7 +2,7 @@
     "name": "micro/dependency-injection",
     "description": "Dependency injection service container",
     "license": "MIT",
-    "type": "micro-library",
+    "type": "library",
     "authors": [
         {
             "name": "Stanislau.Komar",
@@ -13,12 +13,10 @@
         "php": "^8.2",
         "psr/container": "^2.0"
     },
-    "require-dev": {
-        "ergebnis/composer-normalize": "^2.29"
-    },
     "suggest": {
         "micro/autowire": "Autowire helper for dependency injection"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Framework\\DependencyInjection\\": "/"
@@ -28,34 +26,6 @@
         ]
     },
     "config": {
-        "allow-plugins": {
-            "ergebnis/composer-normalize": true
-        },
         "sort-packages": true
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.x-dev"
-        }
-    },
-    "scripts": {
-        "coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text",
-        "coverage-html": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html ./test-coverage-report",
-        "php-cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --verbose --using-cache=no",
-        "php-cs-try": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --verbose --dry-run --using-cache=no",
-        "phpstan": "./vendor/bin/phpstan analyze --no-progress",
-        "phpunit": "./vendor/bin/phpunit",
-        "psalm": "./vendor/bin/psalm --no-progress --show-info=true",
-        "statics": [
-            "@phpstan",
-            "@psalm",
-            "@php-cs-try"
-        ],
-        "test": [
-            "@statics",
-            "composer validate --strict",
-            "composer normalize",
-            "@coverage"
-        ]
     }
 }

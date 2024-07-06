@@ -9,7 +9,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Micro\Framework\DependencyInjection\Tests;
+namespace Micro\Framework\DependencyInjection\Tests\Unit;
 
 use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
