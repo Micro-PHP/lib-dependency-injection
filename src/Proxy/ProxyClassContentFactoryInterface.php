@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  *  This file is part of the Micro framework package.
  *
@@ -9,10 +11,12 @@
  *  file that was distributed with this source code.
  */
 
-namespace Micro\Component\DependencyInjection\Exception;
+namespace Micro\Component\DependencyInjection\Proxy;
 
-use Psr\Container\ContainerExceptionInterface;
-
-final class ServiceRegistrationException extends \RuntimeException implements ContainerExceptionInterface
+interface ProxyClassContentFactoryInterface
 {
+    /**
+     * @param class-string $className
+     */
+    public function create(string $className): string;
 }

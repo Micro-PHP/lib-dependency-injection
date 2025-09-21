@@ -13,7 +13,6 @@ namespace Micro\Component\DependencyInjection;
 
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
-use Psr\Container\ContainerInterface;
 
 /**
  * @author Stanislau Komar <head.trackingsoft@gmail.com>
@@ -26,12 +25,12 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     private array $services = [];
 
     /**
-     * @var array<class-string, callable(Container): object>
+     * @var array<class-string, callable>
      */
     private array $servicesRaw = [];
 
     /**
-     * @var array<class-string, array<int, array<callable(object, Container): object>>>
+     * @var array<class-string, array<int, array<int, callable>>>
      */
     private array $decorators = [];
 
@@ -45,6 +44,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      *
      * @psalm-return T
      */
+    #[\Override]
     public function get(string $id): object
     {
         if (!empty($this->services[$id])) {
@@ -61,15 +61,18 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
+    #[\Override]
     public function has(string $id): bool
     {
-        return !empty($this->servicesRaw[$id]) || !empty($this->services[$id]);
+        return \array_key_exists($id, $this->servicesRaw)
+            || \array_key_exists($id, $this->services);
     }
 
+    #[\Override]
     public function register(string $id, callable $service, bool $force = false): void
     {
         if ($this->has($id) && !$force) {
-            throw new ServiceRegistrationException(sprintf('Service "%s" already registered', $id));
+            throw new ServiceRegistrationException(\sprintf('Service "%s" already registered', $id));
         }
 
         $this->servicesRaw[$id] = $service;
@@ -78,11 +81,23 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
     /**
      * @psalm-suppress InvalidPropertyAssignmentValue
      */
+    #[\Override]
     public function decorate(string $id, callable $service, int $priority = 0): void
     {
         if (!\array_key_exists($id, $this->decorators)) {
+            /**
+             * @psalm-suppress PropertyTypeCoercion
+             *
+             * @phpstan-ignore-next-line
+             */
             $this->decorators[$id] = [];
         }
+
+        /**
+         * @psalm-suppress PropertyTypeCoercion
+         *
+         * @phpstan-ignore-next-line
+         */
         $this->decorators[$id][$priority][] = $service;
     }
 
@@ -93,7 +108,7 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      */
     protected function initializeService(string $serviceId): void
     {
-        if (empty($this->servicesRaw[$serviceId])) {
+        if (!isset($this->servicesRaw[$serviceId])) {
             throw new ServiceNotRegisteredException($serviceId);
         }
 

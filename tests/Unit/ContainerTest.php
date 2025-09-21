@@ -11,20 +11,50 @@
 
 namespace Micro\Component\DependencyInjection\Tests;
 
-use Micro\Component\DependencyInjection\Container;
+use Micro\Component\DependencyInjection\ContainerCompiled;
 use Micro\Component\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Component\DependencyInjection\Exception\ServiceRegistrationException;
+use Micro\Component\DependencyInjection\Proxy\ProxyBuilder;
+use Micro\Component\DependencyInjection\Proxy\ProxyClassNameGenerator;
+use Micro\Component\DependencyInjection\Proxy\ProxyFactory;
+use Micro\Component\DependencyInjection\Proxy\ProxyFileManager;
 use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase
 {
+    protected function createContainer(): ContainerCompiled
+    {
+        $fileManager = new ProxyFileManager(
+            __DIR__.'/var/proxy.cache.php',
+        );
+
+        $classNameGenerator = new ProxyClassNameGenerator(
+            'Micro'
+        );
+
+        $classContentFactory = new ProxyFactory(
+            $classNameGenerator
+        );
+
+        $proxyBuilder = new ProxyBuilder(
+            $classContentFactory,
+            $fileManager,
+        );
+
+        return new ContainerCompiled(
+            $classNameGenerator,
+            $proxyBuilder
+        );
+    }
+
     public function testContainerResolveDependencies(): void
     {
-        $container = new Container();
+        $container = $this->createContainer();
 
         $container->register('test', function () {
             return new NamedService('success');
         });
+        $container->compile();
 
         /** @var NamedInterface $service */
         $service = $container->get('test');
@@ -37,27 +67,31 @@ class ContainerTest extends TestCase
     public function testRegisterTwoServicesWithEqualAliasesException(): void
     {
         $this->expectException(ServiceRegistrationException::class);
-        $container = new Container();
+        $container = $this->createContainer();
 
-        $container->register('test', function () { return new class() {}; });
-        $container->register('test', function () { return new class() {}; });
+        $container->register('test', function () { return new class {}; });
+        $container->register('test', function () { return new class {}; });
+
+        $container->compile();
     }
 
     public function testContainerUnresolvedException(): void
     {
         $this->expectException(ServiceNotRegisteredException::class);
 
-        $container = new Container();
+        $container = $this->createContainer();
         $container->register(NamedInterface::class, function (): NamedInterface {
             return new NamedService('success');
         });
+
+        $container->compile();
 
         $container->get('test2');
     }
 
     public function testDecorateService(): void
     {
-        $container = new Container();
+        $container = $this->createContainer();
 
         $container->register(NamedInterface::class, function (): NamedInterface {
             return new NamedService('A');
@@ -75,6 +109,8 @@ class ContainerTest extends TestCase
             return new NamedServiceDecorator($decorated, 'C');
         }, 5);
 
+        $container->compile();
+
         $result = $container->get(NamedInterface::class);
 
         $this->assertInstanceOf(NamedServiceDecorator::class, $result);
@@ -86,7 +122,7 @@ class ContainerTest extends TestCase
 
     public function testUnregisteredException()
     {
-        $container = new Container();
+        $container = $this->createContainer();
         $service = 'UnresolvedService';
 
         $this->expectException(ServiceNotRegisteredException::class);
@@ -102,7 +138,7 @@ class ContainerTest extends TestCase
 
     public function testDecoratorsWithSamePriority(): void
     {
-        $container = new Container();
+        $container = $this->createContainer();
 
         $container->register(NamedInterface::class, function (): NamedInterface {
             return new NamedService('A');
@@ -123,6 +159,8 @@ class ContainerTest extends TestCase
         $container->decorate(NamedInterface::class, function (NamedInterface $decorated): NamedInterface {
             return new NamedServiceDecorator($decorated, 'C');
         }, 10);
+
+        $container->compile();
 
         $result = $container->get(NamedInterface::class);
         $this->assertInstanceOf(NamedServiceDecorator::class, $result);
@@ -152,7 +190,7 @@ readonly class NamedServiceDecorator implements NamedInterface
 {
     public function __construct(
         private object $decorated,
-        private string $name
+        private string $name,
     ) {
     }
 

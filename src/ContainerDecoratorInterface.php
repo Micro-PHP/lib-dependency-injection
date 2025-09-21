@@ -16,7 +16,8 @@ interface ContainerDecoratorInterface
     /**
      * @template T of object
      *
-     * @param class-string<T> $id
+     * @param class-string<T>|non-empty-string   $id
+     * @param callable(T, ContainerInterface): T $service
      */
     public function decorate(string $id, callable $service, int $priority = 0): void;
 }

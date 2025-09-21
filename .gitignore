@@ -2,8 +2,10 @@
 vendor
 composer.lock
 .phpunit.result.cache
+.phpunit.cache
 .php-cs-fixer.cache
 test-coverage-report
 phpunit.xml
 .php-cs-fixer.php
 phpstan.neon
+tests/Unit/var

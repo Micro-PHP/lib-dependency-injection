@@ -24,7 +24,8 @@ return (new PhpCsFixer\Config())
  For the full copyright and license information, please view the LICENSE
  file that was distributed with this source code.
 EOF
-        ]
+        ],
+        'phpdoc_to_comment' => false, // отключаем
     ))
     ->setRiskyAllowed(true)
     ->setFinder($finder);

@@ -11,15 +11,15 @@
     ],
     "require": {
         "php": "^8.2",
-        "psr/container": "^2.0"
+        "psr/container": "^2"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.29",
-        "friendsofphp/php-cs-fixer": "^3.13",
-        "phpstan/phpstan": "^1.9",
-        "phpunit/php-code-coverage": "^9.2",
-        "phpunit/phpunit": "^9.5",
-        "vimeo/psalm": "^5.2"
+        "ergebnis/composer-normalize": "^2",
+        "friendsofphp/php-cs-fixer": "^3",
+        "phpstan/phpstan": "^2",
+        "phpunit/php-code-coverage": "^10 || ^11 || ^12",
+        "phpunit/phpunit": "^10 || ^11 || ^12",
+        "vimeo/psalm": "^6"
     },
     "suggest": {
         "micro/autowire": "Autowire helper for dependency injection"

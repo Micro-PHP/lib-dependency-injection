@@ -18,8 +18,8 @@ interface ContainerRegistryInterface
      *
      * @template T of Object
      *
-     * @param class-string<T> $id      service alias
-     * @param callable        $service service initialization callback
+     * @param class-string<T>                     $id      service alias
+     * @param callable(object, Container): object $service service initialization callback
      */
     public function register(string $id, callable $service, bool $force = false): void;
 }
