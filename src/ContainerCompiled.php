@@ -57,7 +57,7 @@ final class ContainerCompiled extends Container implements ContainerRegistryComp
          *
          * @psalm-suppress MixedMethodCall
          */
-        $instance = new $proxyClass($this);
+        $instance = new $proxyClass($this->decorated);
 
         return $instance;
     }
