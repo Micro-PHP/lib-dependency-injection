@@ -200,10 +200,8 @@ final class ProxyFactory implements ProxyClassContentFactoryInterface
         string $methods,
         bool $isInterface,
     ): string {
-        $template = "final readonly class %s %s %s
+        $template = "final %s class %s %s %s
 {
-    private ?%s \$_proxiedObject;
-
     public function __construct(
         private \Psr\Container\ContainerInterface \$container
     ) {
@@ -222,9 +220,9 @@ final class ProxyFactory implements ProxyClassContentFactoryInterface
 
         return \sprintf(
             $template,
+            $classRef->isReadOnly() ? 'readonly' : '',
             $proxyClassName,
             $isInterface ? 'implements' : 'extends',
-            $fullClassName,
             $fullClassName,
             $fullClassName,
             $this->createProxyClassConstructor($classRef),
