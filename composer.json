@@ -13,14 +13,6 @@
         "php": "^8.2",
         "psr/container": "^2"
     },
-    "require-dev": {
-        "ergebnis/composer-normalize": "^2",
-        "friendsofphp/php-cs-fixer": "^3",
-        "phpstan/phpstan": "^2",
-        "phpunit/php-code-coverage": "^10 || ^11 || ^12",
-        "phpunit/phpunit": "^10 || ^11 || ^12",
-        "vimeo/psalm": "^6"
-    },
     "suggest": {
         "micro/autowire": "Autowire helper for dependency injection"
     },
@@ -36,7 +28,8 @@
     },
     "config": {
         "allow-plugins": {
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "micro/testing-tool": true
         },
         "sort-packages": true
     },
@@ -64,5 +57,8 @@
             "composer normalize",
             "@coverage"
         ]
+    },
+    "require-dev": {
+        "micro/testing-tool": "^1.7"
     }
 }

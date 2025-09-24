@@ -8,4 +8,5 @@ test-coverage-report
 phpunit.xml
 .php-cs-fixer.php
 phpstan.neon
+psalm.xml
 tests/Unit/var
